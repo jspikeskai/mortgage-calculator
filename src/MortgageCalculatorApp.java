@@ -1,129 +1,72 @@
 import module java.base;
 
 public class MortgageCalculatorApp {
-    void main() {
+    public static boolean isQuitting = false;
+
+    static void main() {
         final String QUIT_KEYWORD = ColoredText.color(ColoredText.RED, "quit");
         final String WELCOME_MESSAGE = ColoredText.color(ColoredText.BLUE, "Welcome to Mortgage Calculator!");
         final String INFO_MESSAGE = WELCOME_MESSAGE + "\nTo exit the program type '" + QUIT_KEYWORD + "'\n";
         final String QUIT_MESSAGE = ColoredText.color(ColoredText.CYAN, "Thanks for using Mortgage Calculator!");
-        final String INVALID_MESSAGE = ColoredText.color(ColoredText.RED, "Invalid input: ");
-
-        boolean isQuitting = false;
 
         try (Scanner scanner = new Scanner(System.in)) {
-            while (true) {
+            while (!isQuitting) {
                 IO.println(INFO_MESSAGE);
 
                 int principal = MortgageParameters.MINIMUM_PRINCIPAL;
-                while (true) {
-                    IO.print("Principal: ");
-                    Number input = ConsoleReader.readInput(scanner);
-
-                    if (input.equals(-1)) {
-                        isQuitting = true;
-                        break;
-                    }
+                while (!isQuitting) {
+                    Number input = Console.readInput("Principal: ", scanner);
 
                     principal = input.intValue();
 
-                    boolean validData = ConsoleReader.validateData(principal, MortgageParameters.MINIMUM_PRINCIPAL, MortgageParameters.MAXIMUM_PRINCIPAL);
+                    boolean validData = Console.validateData(principal, MortgageParameters.MINIMUM_PRINCIPAL, MortgageParameters.MAXIMUM_PRINCIPAL);
                     if (validData) {
                         break;
-                    } else {
-                        String minPrincipal = ColoredText.color(ColoredText.YELLOW, Short.toString(MortgageParameters.MINIMUM_PRINCIPAL));
-                        String maxPrincipal = ColoredText.color(ColoredText.YELLOW, Integer.toString(MortgageParameters.MAXIMUM_PRINCIPAL));
-
-                        IO.println(INVALID_MESSAGE + "Number must be between " + minPrincipal + " and " + maxPrincipal);
                     }
-                }
-
-                if (isQuitting) {
-                    break;
                 }
 
                 final int MAXIMUM_DOWN_PAYMENT = principal - 1_000;
 
-                int downPayment = MortgageParameters.MINIMUM_DOWN_PAYMENT;
+                int downPayment;
                 while (true) {
-                    IO.print("Down Payment: ");
-                    Number input = ConsoleReader.readInput(scanner);
-
-                    if (input.equals(-1)) {
-                        isQuitting = true;
-                        break;
-                    }
+                    Number input = Console.readInput("Down Payment: ", scanner);
 
                     downPayment = input.intValue();
 
-                    boolean validData = ConsoleReader.validateData(downPayment, MortgageParameters.MINIMUM_DOWN_PAYMENT, MAXIMUM_DOWN_PAYMENT);
+                    boolean validData = Console.validateData(downPayment, MortgageParameters.MINIMUM_DOWN_PAYMENT, MAXIMUM_DOWN_PAYMENT);
                     if (validData) {
                         break;
-                    } else {
-                        String minDownPayment = ColoredText.color(ColoredText.YELLOW, Byte.toString(MortgageParameters.MINIMUM_DOWN_PAYMENT));
-                        String maxDownPayment = ColoredText.color(ColoredText.YELLOW, Integer.toString(MAXIMUM_DOWN_PAYMENT));
-
-                        IO.println(INVALID_MESSAGE + "Number must be between " + minDownPayment + " and " + maxDownPayment);
                     }
-                }
-
-                if (isQuitting) {
-                    break;
                 }
 
                 principal -= downPayment;
 
-                double annualInterestRate = MortgageParameters.MINIMUM_INTEREST_RATE;
-                double monthlyInterestRate = annualInterestRate / MortgageParameters.PERCENT / MortgageParameters.MONTHS_IN_YEAR;
+                double annualInterestRate;
+                double monthlyInterestRate;
 
                 while (true) {
-                    IO.print("Interest Rate: ");
-                    Number input = ConsoleReader.readInput(scanner);
-
-                    if (input.equals(-1)) {
-                        isQuitting = true;
-                        break;
-                    }
+                    Number input = Console.readInput("Interest Rate: ", scanner);
 
                     annualInterestRate = input.doubleValue();
 
-                    boolean validData = ConsoleReader.validateData(annualInterestRate, MortgageParameters.MINIMUM_INTEREST_RATE, MortgageParameters.MAXIMUM_INTEREST_RATE);
+                    boolean validData = Console.validateData(annualInterestRate, MortgageParameters.MINIMUM_INTEREST_RATE, MortgageParameters.MAXIMUM_INTEREST_RATE);
                     if (validData) {
                         monthlyInterestRate = annualInterestRate / MortgageParameters.PERCENT / MortgageParameters.MONTHS_IN_YEAR;
                         break;
-                    } else {
-                        String minInterestRate = ColoredText.color(ColoredText.YELLOW, Byte.toString(MortgageParameters.MINIMUM_INTEREST_RATE));
-                        String maxInterestRate = ColoredText.color(ColoredText.YELLOW, Byte.toString(MortgageParameters.MAXIMUM_INTEREST_RATE));
-
-                        IO.println(INVALID_MESSAGE + "Number must be between " + minInterestRate + " and " + maxInterestRate);
                     }
                 }
 
-                int period = MortgageParameters.MINIMUM_PERIOD;
+                int period;
                 while (true) {
-                    IO.print("Period (Years): ");
-                    Number input = ConsoleReader.readInput(scanner);
-
-                    if (input.equals(-1)) {
-                        isQuitting = true;
-                        break;
-                    }
+                    Number input = Console.readInput("Period (Years): ", scanner);
 
                     period = input.intValue();
 
-                    boolean validData = ConsoleReader.validateData(period, MortgageParameters.MINIMUM_PERIOD, MortgageParameters.MAXIMUM_PERIOD);
+                    boolean validData = Console.validateData(period, MortgageParameters.MINIMUM_PERIOD, MortgageParameters.MAXIMUM_PERIOD);
                     if (validData) {
                         period *= MortgageParameters.MONTHS_IN_YEAR;
                         break;
-                    } else {
-                        String minPeriod = ColoredText.color(ColoredText.YELLOW, Byte.toString(MortgageParameters.MINIMUM_PERIOD));
-                        String maxPeriod = ColoredText.color(ColoredText.YELLOW, Byte.toString(MortgageParameters.MAXIMUM_PERIOD));
-
-                        IO.println(INVALID_MESSAGE + "Number must be between " + minPeriod + " and " + maxPeriod);
                     }
-                }
-
-                if (isQuitting) {
-                    break;
                 }
 
                 double mortgage = MortgageCalculatorService.calculateMortgage(principal, monthlyInterestRate, period);
@@ -137,6 +80,7 @@ public class MortgageCalculatorApp {
                 IO.println(mortgageMessage + mortgageAmount);
                 IO.println();
             }
+        } catch (Exception e) {
             IO.println(QUIT_MESSAGE);
         }
     }
