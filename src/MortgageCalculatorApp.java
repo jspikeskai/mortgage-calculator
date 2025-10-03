@@ -70,14 +70,26 @@ public class MortgageCalculatorApp {
                 }
 
                 double mortgage = MortgageCalculatorService.calculateMortgage(principal, monthlyInterestRate, period);
+                double totalPayment = MortgageCalculatorService.calculateTotalPayment(mortgage, period);
+                double totalInterest = MortgageCalculatorService.calculateTotalInterest(totalPayment, principal);
 
                 NumberFormat currency = NumberFormat.getCurrencyInstance();
-                String formattedMortgage = currency.format(mortgage);
 
+                String formattedMortgage = currency.format(mortgage);
                 String mortgageMessage = ColoredText.color(ColoredText.BLUE, "Monthly Mortgage: ");
                 String mortgageAmount = ColoredText.color(ColoredText.GREEN, formattedMortgage);
 
+                String formattedTotalPayment = currency.format(totalPayment);
+                String totalPaymentMessage = ColoredText.color(ColoredText.BLUE, "Total Payment: ");
+                String totalPaymentAmount = ColoredText.color(ColoredText.GREEN, formattedTotalPayment);
+
+                String formattedTotalInterest = currency.format(totalInterest);
+                String totalInterestMessage = ColoredText.color(ColoredText.BLUE, "Total Interest: ");
+                String totalInterestAmount = ColoredText.color(ColoredText.GREEN, formattedTotalInterest);
+
                 IO.println(mortgageMessage + mortgageAmount);
+                IO.println(totalPaymentMessage + totalPaymentAmount);
+                IO.println(totalInterestMessage + totalInterestAmount);
                 IO.println();
             }
         } catch (Exception e) {
